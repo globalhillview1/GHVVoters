@@ -146,14 +146,14 @@
 
   <script>
   const API = '/api';
- await fetch(`${API}?action=voters`)
+ await fetch(`${API}?action=Voters`)
 
   const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
   let all=[], rows=[], sortKey='serial', sortDir='asc';
 
   async function fetchVoters(){
-    const r=await fetch(`${API}?action=voters`,{cache:'no-store'});
+    const r=await fetch(`${API}?action=Voters`,{cache:'no-store'});
     const j=await r.json(); if(!j.ok) throw new Error(j.error||'Failed'); return j.data||[];
   }
   async function addVoter(payload){
