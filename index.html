@@ -2,75 +2,108 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Voters Management</title>
+  <title>Voters</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    /* CSS Styling - All Inline for simplicity and best performance on GitHub Pages */
+    /* CSS Styling */
     :root{
       --bg:#f7f9fc; --card:#fff; --text:#0f172a; --muted:#64748b; --border:#e5e7eb; --hover:#f1f5f9;
-      --blue:#0d6efd; --danger:#ef4444; --radius:14px;
+      --blue:#0d6efd; --danger:#ef4444; --radius:10px;
     }
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial}
 
-    header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--bg);border-bottom:1px solid var(--border)}
+    /* Header & Layout */
+    header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
     .brand{display:flex;align-items:center;gap:10px}
-    /* Removed image source for GitHub Pages, as it won't be served */
-    .brand img{height:28px;width:28px;border-radius:6px;object-fit:cover} 
+    .brand img{height:28px;width:28px;border-radius:6px;object-fit:cover}
     h1{margin:0;font-weight:800;font-size:20px}
     .wrap{padding:16px}
-    .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:12px}
-    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
     .muted{color:var(--muted)}
     .hidden{display:none}
-    input,select,textarea{border:1px solid var(--border);border-radius:10px;padding:8px 10px;font:inherit}
-    .btn{appearance:none;border:1px solid var(--border);background:#fff;padding:8px 12px;border-radius:10px;cursor:pointer}
-    .btn:hover{background:var(--hover)}
+
+    /* Form Elements */
+    input,select,textarea{border:1px solid var(--border);border-radius:8px;padding:8px 10px;font:inherit;outline:none;}
+    input:focus, select:focus, textarea:focus {border-color: var(--blue); box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);}
+    .btn{appearance:none;border:none;background:var(--hover);padding:10px 14px;border-radius:8px;cursor:pointer;transition:background 0.1s; font-weight: 500;}
+    .btn:hover{background:var(--border)}
     .btn.primary{background:var(--blue);color:#fff;border-color:transparent}
+    .btn.primary:hover{background:#0b5ed7}
     .btn.danger{background:var(--danger);color:#fff;border-color:transparent}
-
-    .tableWrap{overflow:auto;border:1px solid var(--border);border-radius:12px;max-height:70vh;background:#fff}
-    table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
-    thead th{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);padding:10px;text-align:left;white-space:nowrap;z-index:1}
-    tbody td{border-top:1px solid var(--border);padding:10px;vertical-align:top;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    th.sort{cursor:pointer;user-select:none}
-    th.sort:after{content:" ⇵";color:#94a3b8;font-weight:400}
-    th.sort.asc:after{content:" ↑"} th.sort.desc:after{content:" ↓"}
-
-    /* simple breadcrumb */
+    .btn.danger:hover{background:#dc3545}
+    
+    /* Breadcrumb */
     .breadcrumb{display:flex;flex-wrap:wrap;gap:6px;align-items:center;
-      padding:8px 20px 0 20px;color:#6b7280;font:12px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial}
+      padding:8px 16px 0;color:#6b7280;font-size:14px;}
     .breadcrumb a{color:inherit;text-decoration:none}
     .breadcrumb a:hover{text-decoration:underline}
     .breadcrumb .sep{opacity:.6}
 
-    /* modal */
-    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;align-items:center;justify-content:center}
-    .modal .box{background:#fff;border-radius:12px;border:1px solid var(--border);padding:16px;width:min(900px,95vw)}
-    .box h3{margin:6px 0 12px}
+    /* Table Styling */
+    .tableWrap{overflow:auto;max-height:calc(100vh - 200px); background:#fff; border-radius: var(--radius);}
+    table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed; min-width: 1200px;}
+    thead th{position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--border);padding:12px 10px;text-align:left;white-space:nowrap;z-index:1; font-weight: 600; color: var(--muted);}
+    tbody tr:hover {background: var(--hover);}
+    tbody td{border-top:1px solid var(--border);padding:10px;vertical-align:top;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; max-width: 250px;}
+    
+    /* Sort Icons */
+    th.sort{cursor:pointer;user-select:none; position: relative; padding-right: 25px;}
+    th.sort:after{content:"\21C5";color:#94a3b8;font-weight:400; position: absolute; right: 8px; top: 12px; font-size: 14px;}
+    th.sort.asc:after{content:"\2191"; color: var(--blue);} 
+    th.sort.desc:after{content:"\2193"; color: var(--blue);}
+    th:not(.sort):after { content: '';} /* Ensure non-sortable headers don't have an icon */
+
+
+    /* Modal */
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;align-items:center;justify-content:center;padding:10px;}
+    .modal .box{background:#fff;border-radius:12px;border:1px solid var(--border);padding:24px;width:min(900px,95vw); box-shadow: 0 10px 20px rgba(0,0,0,0.1);}
+    .box h3{margin:0 0 16px; font-size: 24px; font-weight: 700;}
+    .modal label {display: block; margin-bottom: 15px; font-weight: 500;}
+    .modal label input, .modal label select {margin-top: 4px; display: block; width: 100%;}
+    .modal-fields {display: flex; flex-wrap: wrap; gap: 20px;}
+    .modal-fields > label {flex: 1 1 200px;}
+    .modal-fields > label.full-width {flex: 1 1 100%;}
+    
+    /* Responsive Adjustments */
+    @media (max-width: 600px) {
+      header {flex-direction: column; align-items: flex-start;}
+      .header-actions {width: 100%; justify-content: space-between;}
+      .wrap {padding: 8px;}
+      .card {padding: 12px;}
+      .row {gap: 8px;}
+      .modal-fields > label {flex: 1 1 100%; margin-bottom: 10px;}
+    }
   </style>
 </head>
 <body>
+  
   <header>
     <div class="brand">
-            <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="logo" style="display:none">
+      <!-- Icon Placeholder -->
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM6.09 17.52C7.38 16.32 9.5 15.5 12 15.5C14.5 15.5 16.62 16.32 17.91 17.52C16.5 18.87 14.33 19.75 12 19.75C9.67 19.75 7.5 18.87 6.09 17.52ZM12 14C13.66 14 15 12.66 15 11C15 9.34 13.66 8 12 8C10.34 8 9 9.34 9 11C9 12.66 10.34 14 12 14ZM19.93 15.82C18.45 14.07 15.64 13.25 12 13.25C8.36 13.25 5.55 14.07 4.07 15.82C3.19 14.61 2.75 13.34 2.75 12C2.75 6.84 6.84 2.75 12 2.75C17.16 2.75 21.25 6.84 21.25 12C21.25 13.34 20.81 14.61 19.93 15.82Z" fill="#0d6efd"/>
+      </svg>
       <h1>Voters</h1>
     </div>
-    <div class="row">
-      <button class="btn" onclick="location.href='.'">Home</button>
+    <div class="row header-actions">
+      <span class="muted" id="userBadge">@demo</span>
+      <button class="btn" onclick="location.href='.'">Back to Dashboard</button>
+      <button class="btn danger" onclick="logout()">Logout</button>
     </div>
   </header>
 
-    <nav class="breadcrumb">
+  <nav class="breadcrumb">
     <a href=".">Home</a> <span class="sep">/</span> <span>Voters</span>
   </nav>
 
   <div class="wrap">
     <div class="card">
-      <div class="row" style="justify-content:space-between">
+      <div class="row" style="justify-content:space-between; margin-bottom: 12px;">
         <div class="row">
-          <input id="q" placeholder="Quick search…" style="min-width:260px">
-          <span id="meta" class="muted">Public view</span>
+          <input id="q" placeholder="Quick search..." style="min-width:280px">
+          <span id="meta" class="muted">Timezone: IST</span>
         </div>
         <div class="row">
           <button id="addBtn" class="btn primary">+ Add Voter</button>
@@ -78,19 +111,19 @@
         </div>
       </div>
 
-      <div class="tableWrap" style="margin-top:10px">
+      <div class="tableWrap">
         <table id="grid">
           <colgroup>
-            <col style="width:90px">
-            <col style="width:90px">
-            <col style="width:110px">
-            <col style="width:240px">
-            <col style="width:240px">
-            <col style="width:130px">
-            <col style="width:130px">
-            <col style="width:180px">
-            <col style="width:130px">
-            <col style="width:160px">
+            <col style="width:70px"> <!-- Serial # -->
+            <col style="width:90px"> <!-- Tower No. -->
+            <col style="width:90px"> <!-- Flat No. -->
+            <col style="width:200px"> <!-- First Owner Name -->
+            <col style="width:200px"> <!-- Second Owner Name -->
+            <col style="width:120px"> <!-- Card & Share # -->
+            <col style="width:120px"> <!-- Eligible Voter -->
+            <col style="width:180px"> <!-- Discrepancy -->
+            <col style="width:120px"> <!-- Voted Earlier -->
+            <col style="width:150px"> <!-- Actions -->
           </colgroup>
           <thead>
             <tr>
@@ -106,200 +139,261 @@
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="body"></tbody>
+          <tbody id="body">
+            <!-- Data rows will be injected here -->
+          </tbody>
         </table>
       </div>
     </div>
   </div>
 
-    <div id="modal" class="modal">
+  <!-- Add/Edit Modal -->
+  <div id="modal" class="modal">
     <div class="box">
       <h3 id="m_title">Add Voter</h3>
       <input id="m_serial" type="hidden">
-      <div class="row" style="flex-wrap:wrap">
-        <label>Tower No. <input id="m_tower" style="width:120px"></label>
-        <label>Flat No. <input id="m_flat" style="width:140px"></label>
-        <label style="flex:1 1 280px">First Owner Name <input id="m_first" style="width:100%"></label>
-        <label style="flex:1 1 280px">Second Owner Name <input id="m_second" style="width:100%"></label>
-        <label>Card &amp; Share # <input id="m_cardshare" type="number" step="1" min="0" style="width:140px"></label>
+      <div class="modal-fields">
+        <label>Tower No. <input id="m_tower" required></label>
+        <label>Flat No. <input id="m_flat" required></label>
+        <label>Card &amp; Share # <input id="m_cardshare" type="number" step="1" min="0" placeholder="(Optional)"></label>
+        
+        <label class="full-width">First Owner Name <input id="m_first" required></label>
+        <label class="full-width">Second Owner Name <input id="m_second" placeholder="(Optional)"></label>
+        
         <label>Eligible Voter
-          <select id="m_eligible"><option>Yes</option><option>No</option></select>
-        </label>
-        <label style="flex:1 1 260px">Discrepancy
-          <input id="m_discrepancy" style="width:100%" placeholder="(optional)">
+          <select id="m_eligible">
+            <option>Yes</option>
+            <option>No</option>
+          </select>
         </label>
         <label>Voted Earlier
-          <select id="m_voted"><option>Yes</option><option>No</option></select>
+          <select id="m_voted">
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </label>
+        <label class="full-width">Discrepancy
+          <input id="m_discrepancy" placeholder="(Optional)">
         </label>
       </div>
-      <div class="row" style="margin-top:10px">
+      <div class="row" style="margin-top:20px; justify-content: flex-end;">
+        <span id="m_status" class="muted"></span>
         <button class="btn" onclick="closeModal()">Cancel</button>
-        <button id="m_save" class="btn primary">Save</button>
-        <span id="m_status" class="muted" style="margin-left:auto"></span>
+        <button id="m_save" class="btn primary">Save Voter</button>
       </div>
     </div>
   </div>
 
   <script>
-  /*     🚨 IMPORTANT: REPLACE THE PLACEHOLDER BELOW 🚨
-        Use the exact, deployed URL of your Google Apps Script (code.gs).
-        Example: 'https://script.google.com/macros/s/AKfycby5tqQAlF7k3j.../exec'
-  */
-  const API = '/api'; // <-- UPDATE THIS LINE!
-  
-  const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    /* ====== Config / helpers ====== */
+    // 🚨 IMPORTANT: Replace this placeholder with your actual deployed Apps Script URL
+    const API = '/api'; 
 
-  let all=[], rows=[], sortKey='serial', sortDir='asc';
+    // Basic helper functions
+    const esc = s => String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const logout = () => { console.log("Logging out (simulated)"); location.href='.'; }; // Simple redirect for this demo
 
-  // API Calls
-  async function fetchVoters(){
-    const r=await fetch(`${API}?action=voters`,{cache:'no-store'});
-    const j=await r.json(); if(!j.ok) throw new Error(j.error||'Failed'); return j.data||[];
-  }
-  async function addVoter(payload){
-    const r=await fetch(`${API}?action=addvoter`,{
-      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
-    });
-    const j=await r.json(); if(!j.ok) throw new Error(j.error||'Failed'); return j.data;
-  }
-  async function updateVoter(payload){
-    const r=await fetch(`${API}?action=updatevoter`,{
-      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
-    });
-    const j=await r.json(); if(!j.ok) throw new Error(j.error||'Failed'); return j.data;
-  }
-  async function deleteVoter(serial){
-    const r=await fetch(`${API}?action=deletevoter`,{
-      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({serial})
-    });
-    const j=await r.json(); if(!j.ok) throw new Error(j.error||'Failed'); return j.data;
-  }
+    let all=[], rows=[], sortKey='serial', sortDir='asc';
 
-  // Data Handling and Rendering
-  function apply(){
-    const q=(document.getElementById('q').value||'').toLowerCase();
-    rows = (all||[]).filter(r=>{
-      const hay = `${r.serial} ${r.tower} ${r.flat} ${r.firstOwner} ${r.secondOwner} ${r.cardShare} ${r.eligible} ${r.discrepancy||''} ${r.votedEarlier}`.toLowerCase();
-      return !q || hay.includes(q);
-    }).sort((a,b)=>{
-      let A=a[sortKey], B=b[sortKey];
-      if(sortKey==='serial' || sortKey==='cardShare'){ A=Number(A||0); B=Number(B||0); }
-      else if(sortKey==='flat'){ const na=parseInt(A,10), nb=parseInt(B,10); if(!isNaN(na)&&!isNaN(nb)){ A=na; B=nb; } }
-      else { A=(A??'').toString().toLowerCase(); B=(B??'').toString().toLowerCase(); }
-      const s=(A<B?-1:A>B?1:0); return sortDir==='asc'?s:-s;
-    });
-    render();
-  }
-  function render(){
-    const tb=document.getElementById('body'); tb.innerHTML='';
-    rows.forEach(r=>{
-      const tr=document.createElement('tr');
-      tr.innerHTML=`
-        <td>${esc(r.serial)}</td>
-        <td>${esc(r.tower)}</td>
-        <td>${esc(r.flat)}</td>
-        <td title="${esc(r.firstOwner)}">${esc(r.firstOwner)}</td>
-        <td title="${esc(r.secondOwner||'')}">${esc(r.secondOwner||'')}</td>
-        <td>${r.cardShare != null && r.cardShare !== '' ? esc(r.cardShare) : ''}</td>
-        <td>${esc(r.eligible)}</td>
-        <td title="${esc(r.discrepancy||'')}">${esc(r.discrepancy||'')}</td>
-        <td>${esc(r.votedEarlier)}</td>
-        <td class="td-actions">
-          <button class="btn" onclick="openModal(true, ${r.serial})">Edit</button>
-          <button class="btn danger" onclick="onDelete(${r.serial})">Delete</button>
-        </td>`;
-      tb.appendChild(tr);
-    });
-    document.getElementById('status').textContent = `${rows.length} voter(s)`;
-  }
+    /* ====== API Calls (No Authentication) ====== */
+    
+    async function fetchVoters(){
+      try {
+        const r=await fetch(`${API}?action=voters`,{cache:'no-store'});
+        const j=await r.json(); 
+        if(!j.ok) throw new Error(j.error||'Failed to fetch data'); 
+        return j.data||[];
+      } catch (error) {
+        console.error("Fetch error:", error);
+        document.getElementById('status').textContent = 'API Error: ' + error.message;
+        return [];
+      }
+    }
 
-  function attachSort(){
-    document.querySelectorAll('thead th.sort').forEach(th=>{
-      th.addEventListener('click',()=>{
-        const k=th.dataset.k;
-        if(sortKey===k) sortDir = (sortDir==='asc'?'desc':'asc');
-        else { sortKey=k; sortDir='asc'; }
-        document.querySelectorAll('thead th.sort').forEach(x=>x.classList.remove('asc','desc'));
-        th.classList.add(sortDir);
-        apply();
+    async function apiPost(action, payload) {
+      const r=await fetch(`${API}?action=${action}`,{
+        method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
       });
-    });
-  }
+      const j=await r.json(); 
+      if(!j.ok) throw new Error(j.error||'Operation failed'); 
+      return j.data;
+    }
 
-  // Modal Handling
-  function openModal(edit=false, serial=null){
-    document.getElementById('m_status').textContent='';
-    document.getElementById('m_title').textContent = edit?'Edit Voter':'Add Voter';
-    document.getElementById('modal').style.display='flex';
-    if(edit){
-      const r=all.find(x=>x.serial==serial);
-      document.getElementById('m_serial').value=r.serial;
-      document.getElementById('m_tower').value=r.tower||'';
-      document.getElementById('m_flat').value=r.flat||'';
-      document.getElementById('m_first').value=r.firstOwner||'';
-      document.getElementById('m_second').value=r.secondOwner||'';
-      document.getElementById('m_cardshare').value=r.cardShare||'';
-      document.getElementById('m_eligible').value=r.eligible||'Yes';
-      document.getElementById('m_discrepancy').value=r.discrepancy||'';
-      document.getElementById('m_voted').value=r.votedEarlier||'No';
-    }else{
+    async function addVoter(payload){ return apiPost('addvoter', payload); }
+    async function updateVoter(payload){ return apiPost('updatevoter', payload); }
+    async function deleteVoter(serial){ return apiPost('deletevoter', {serial}); }
+
+    /* ====== Rendering and Filtering ====== */
+    function apply(){
+      const q=(document.getElementById('q').value||'').toLowerCase();
+      rows = (all||[]).filter(r=>{
+        // Create a searchable string from all relevant fields
+        const hay = `${r.serial} ${r.tower} ${r.flat} ${r.firstOwner} ${r.secondOwner} ${r.cardShare} ${r.eligible} ${r.discrepancy||''} ${r.votedEarlier}`.toLowerCase();
+        return !q || hay.includes(q);
+      }).sort((a,b)=>{
+        let A=a[sortKey], B=b[sortKey];
+        
+        // Convert to number for specific keys for correct sorting
+        if(sortKey==='serial' || sortKey==='cardShare'){
+          A=Number(A||0); B=Number(B||0);
+        }else if(sortKey==='flat'){
+          const na=parseInt(A,10), nb=parseInt(B,10);
+          // If both are valid numbers, sort numerically, otherwise string comparison
+          if(!isNaN(na) && !isNaN(nb)){ A=na; B=nb; } else { A=(A??'').toString().toLowerCase(); B=(B??'').toString().toLowerCase(); }
+        }else{
+          A=(A??'').toString().toLowerCase(); B=(B??'').toString().toLowerCase();
+        }
+
+        const s=(A<B?-1:A>B?1:0);
+        return sortDir==='asc'?s:-s;
+      });
+      render();
+    }
+
+    function render(){
+      const tb=document.getElementById('body'); 
+      tb.innerHTML='';
+      
+      rows.forEach(r=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`
+          <td>${esc(r.serial)}</td>
+          <td>${esc(r.tower)}</td>
+          <td>${esc(r.flat)}</td>
+          <td title="${esc(r.firstOwner)}">${esc(r.firstOwner)}</td>
+          <td title="${esc(r.secondOwner||'')}">${esc(r.secondOwner||'')}</td>
+          <td>${r.cardShare != null && r.cardShare !== '' ? esc(r.cardShare) : ''}</td>
+          <td>${esc(r.eligible)}</td>
+          <td title="${esc(r.discrepancy||'')}">${esc(r.discrepancy||'')}</td>
+          <td>${esc(r.votedEarlier)}</td>
+          <td class="td-actions">
+            <button class="btn" onclick="openModal(true, ${r.serial})">Edit</button>
+            <button class="btn danger" onclick="onDelete(${r.serial})">Delete</button>
+          </td>`;
+        tb.appendChild(tr);
+      });
+      document.getElementById('status').textContent = `${rows.length} voter(s)`;
+    }
+
+    /* ====== Modal Logic ====== */
+    function openModal(edit=false, serial=null){
+      document.getElementById('m_status').textContent='';
+      document.getElementById('m_title').textContent = edit?'Edit Voter':'Add Voter';
+      
+      // Reset form inputs
       document.getElementById('m_serial').value='';
       ['m_tower','m_flat','m_first','m_second','m_cardshare','m_discrepancy'].forEach(id=>document.getElementById(id).value='');
       document.getElementById('m_eligible').value='Yes';
       document.getElementById('m_voted').value='No';
+      
+      if(edit){
+        const r=all.find(x=>x.serial==serial);
+        if (r) {
+          document.getElementById('m_serial').value=r.serial;
+          document.getElementById('m_tower').value=r.tower||'';
+          document.getElementById('m_flat').value=r.flat||'';
+          document.getElementById('m_first').value=r.firstOwner||'';
+          document.getElementById('m_second').value=r.secondOwner||'';
+          document.getElementById('m_cardshare').value=r.cardShare||'';
+          document.getElementById('m_eligible').value=r.eligible||'Yes';
+          document.getElementById('m_discrepancy').value=r.discrepancy||'';
+          document.getElementById('m_voted').value=r.votedEarlier||'No';
+        }
+      }
+      
+      document.getElementById('modal').style.display='flex';
     }
-  }
-  function closeModal(){ document.getElementById('modal').style.display='none'; }
-
-  async function onSave(){
-    const s=document.getElementById('m_status');
-    const cardShareValue = document.getElementById('m_cardshare').value;
-    const payload={
-      serial: document.getElementById('m_serial').value || undefined,
-      tower: (document.getElementById('m_tower').value||'').trim(),
-      flat: (document.getElementById('m_flat').value||'').trim(),
-      firstOwner: (document.getElementById('m_first').value||'').trim(),
-      secondOwner: (document.getElementById('m_second').value||'').trim(),
-      cardShare: cardShareValue === '' ? '' : Number(cardShareValue), // Send empty string if empty, otherwise a number
-      eligible: document.getElementById('m_eligible').value,
-      discrepancy: (document.getElementById('m_discrepancy').value||'').trim(),
-      votedEarlier: document.getElementById('m_voted').value
-    };
-    if(!payload.tower || !payload.flat || !payload.firstOwner){
-      s.textContent='Tower, Flat and First Owner are required.'; return;
+    
+    function closeModal(){ 
+      document.getElementById('modal').style.display='none'; 
     }
-    s.textContent='Saving…';
-    try{
-      if(payload.serial!=null){ await updateVoter(payload); }
-      else { await addVoter(payload); }
-      s.textContent='Saved'; closeModal(); await reload();
-    }catch(e){ s.textContent='Save failed: '+e.message; }
-  }
-  async function onDelete(serial){
-    if(!confirm('Delete voter #'+serial+'?')) return;
-    try{ await deleteVoter(serial); await reload(); }
-    catch(e){ alert('Delete failed: '+e.message); }
-  }
 
-  async function reload(){
-    try {
-      document.getElementById('status').textContent = 'Loading...';
+    async function onSave(){
+      const s=document.getElementById('m_status');
+      const cardShareValue = document.getElementById('m_cardshare').value;
+      
+      const payload={
+        serial: document.getElementById('m_serial').value || undefined,
+        tower: (document.getElementById('m_tower').value||'').trim(),
+        flat: (document.getElementById('m_flat').value||'').trim(),
+        firstOwner: (document.getElementById('m_first').value||'').trim(),
+        secondOwner: (document.getElementById('m_second').value||'').trim(),
+        cardShare: cardShareValue === '' ? '' : Number(cardShareValue),
+        eligible: document.getElementById('m_eligible').value,
+        discrepancy: (document.getElementById('m_discrepancy').value||'').trim(),
+        votedEarlier: document.getElementById('m_voted').value
+      };
+
+      if(!payload.tower || !payload.flat || !payload.firstOwner){
+        s.textContent='Tower, Flat, and First Owner are required.'; return;
+      }
+
+      s.textContent='Saving...';
+      try{
+        if(payload.serial){ await updateVoter(payload); }
+        else { await addVoter(payload); }
+        
+        s.textContent='Saved'; 
+        closeModal(); 
+        await reload();
+      }catch(e){ 
+        s.textContent='Save failed: '+e.message; 
+      }
+    }
+
+    async function onDelete(serial){
+      if(!window.confirm('Are you sure you want to delete voter #' + serial + '?')) return;
+      try{ 
+        await deleteVoter(serial); 
+        await reload(); 
+      } catch(e){ 
+        // Note: Using window.alert for simplicity since the user's previous code also used it.
+        window.alert('Delete failed: '+e.message); 
+      }
+    }
+
+    
+    /* ====== Initialization ====== */
+    function attachSort(){
+      document.querySelectorAll('thead th.sort').forEach(th=>{
+        th.addEventListener('click',()=>{
+          const k=th.dataset.k;
+          if(sortKey===k) {
+            sortDir = (sortDir==='asc'?'desc':'asc');
+          } else { 
+            sortKey=k; 
+            sortDir='asc'; 
+          }
+          // Update class names for all headers
+          document.querySelectorAll('thead th.sort').forEach(x=>{
+            x.classList.remove('asc','desc');
+          });
+          th.classList.add(sortDir);
+          apply();
+        });
+      });
+    }
+
+    async function reload(){
+      document.getElementById('status').textContent = 'Loading data...';
       all = await fetchVoters();
+      document.getElementById('status').textContent = `Loaded ${all.length} total voter(s).`;
+      // Re-apply filter and sort to render the data
       apply();
-    } catch (e) {
-      document.getElementById('status').textContent = 'Error loading data: ' + e.message;
     }
-  }
 
-  // Initialization
-  document.getElementById('q').addEventListener('input', apply);
-  document.getElementById('addBtn').onclick=()=>openModal(false);
-  document.getElementById('m_save').onclick=onSave;
-  document.getElementById('modal').addEventListener('click',e=>{
-    if(e.target===document.getElementById('modal')) closeModal();
-  });
-  attachSort();
-  reload();
+    // Event Listeners
+    document.getElementById('q').addEventListener('input', apply);
+    document.getElementById('addBtn').onclick=()=>openModal(false);
+    document.getElementById('m_save').onclick=onSave;
+    document.getElementById('modal').addEventListener('click',e=>{
+      if(e.target===document.getElementById('modal')) closeModal();
+    });
+
+    // Initial setup
+    attachSort();
+    reload();
+
   </script>
 </body>
 </html>
