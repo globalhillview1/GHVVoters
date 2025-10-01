@@ -11,13 +11,16 @@
   header{ padding:20px clamp(16px,3vw,32px); display:flex; gap:16px; align-items:center; justify-content:space-between; position:sticky; top:0; backdrop-filter: blur(6px); background:#0b1020cc; border-bottom:1px solid #1f2748; z-index:10 }
   .brand{ font-weight:700; display:flex; gap:10px; align-items:center }
   .brand small{ color:var(--muted) }
-  .toolbar{ display:flex; gap:10px; flex-wrap:wrap }
-  input[type="search"], select{ background:var(--card); color:var(--txt); border:1px solid #263057; border-radius:10px; padding:10px 12px; outline:none }
+  .toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center }
+  input[type="search"], select, .btn{ background:var(--card); color:var(--txt); border:1px solid #263057; border-radius:10px; padding:10px 12px; outline:none }
   input[type="search"]::placeholder{ color:#9aa6d1 }
+  .btn{ cursor:pointer }
   .chip{ padding:10px 12px; background:var(--card); border:1px solid #263057; border-radius:10px; color:var(--muted) }
   .container{ padding:18px clamp(12px,3vw,32px) 40px }
   .section{ background:#0f1734; border:1px solid #233160; border-radius:16px; padding:16px; margin-bottom:18px }
-  .section h2{ margin:0 0 12px; font-size:20px; color:#e5ecff; display:flex; gap:8px; align-items:center }
+  .section h2{ margin:0 0 12px; font-size:26px; color:#e5ecff; font-weight:800 }
+  /* remove any emoji-before */
+  /* .section h2::before{ content:"📊" } */
   .cards{ display:grid; grid-template-columns:repeat(6,minmax(140px,1fr)); gap:14px }
   @media (max-width:1200px){ .cards{ grid-template-columns:repeat(3,1fr) } }
   @media (max-width:640px){ .cards{ grid-template-columns:repeat(2,1fr) } }
@@ -34,12 +37,15 @@
   .sort-ind{ opacity:.7; font-size:12px; padding-left:6px }
 
   .actions{ white-space:nowrap }
-  .btn{ background:#1b2550; border:1px solid #2a3770; color:var(--txt); padding:6px 10px; border-radius:8px; cursor:pointer; font-size:12px; }
-  .btn:disabled{ opacity:.6; cursor:not-allowed }
+  .btn.small{ padding:6px 10px; border-radius:8px; font-size:12px }
   .muted{ color:var(--muted) }
   .pager{ display:flex; gap:8px; align-items:center; justify-content:flex-end; padding:10px 2px }
   @media (max-width:700px){ header{ flex-direction:column; align-items:stretch; gap:12px } .pager{ justify-content:center } }
-  .remark-input{ width:100%; background:#0f1530; color:#fff; border:1px solid #2a3770; border-radius:8px; padding:6px 8px }
+  .field-input{ width:100%; background:#0f1530; color:#fff; border:1px solid #2a3770; border-radius:8px; padding:6px 8px }
+  .titlebar{ display:flex; align-items:center; justify-content:center; gap:12px; text-align:center; }
+  .titlebar img{ width:44px; height:44px; border-radius:8px }
+  .titlebar h1{ margin:0; font-size:28px; font-weight:800 }
+  .top-actions{ display:flex; justify-content:flex-end; margin-top:8px }
 </style>
 </head>
 <body>
@@ -51,20 +57,23 @@
     <select id="sortDir"><option value="asc">▲ Asc</option><option value="desc">▼ Desc</option></select>
     <select id="pageSize"><option>25</option><option>50</option><option selected>100</option><option>250</option></select>
     <span class="chip" id="totalChip">– rows</span>
+    <a href="schedule.html" class="btn">📅 Election Schedule</a>
   </div>
 </header>
 
-<div class="section">
-  <h2 style="display:flex; align-items:center; justify-content:center; gap:12px; text-align:center;">
-    <img src="favicon-32x32.png" alt="Logo" style="height:28px; width:28px;" />
-    Global Hillview, Shareholders/Voters List for RWA Election 2025
-  </h2>
-  <h3 style="margin-top:12px; margin-bottom:12px; font-size:18px; color:#e5ecff;">
-    📊 Voters Statistics
-  </h3>
-  <div class="cards" id="cards"></div>
-</div>
+<div class="container">
+  <!-- Centered title with logo -->
+  <div class="section" style="padding-bottom:8px;">
+    <div class="titlebar">
+      <img src="your-logo.png" alt="Logo" />
+      <h1>Global Hillview, Shareholder (Voter) List for RWA Election 2025</h1>
+    </div>
+  </div>
 
+  <div class="section">
+    <h2>Summary Statistics</h2>
+    <div class="cards" id="cards"></div>
+  </div>
 
   <div class="tablewrap">
     <table id="tbl">
@@ -73,15 +82,15 @@
     </table>
   </div>
   <div class="pager">
-    <button class="btn" id="prevBtn">Prev</button>
+    <button class="btn small" id="prevBtn">Prev</button>
     <span class="muted" id="pageInfo"></span>
-    <button class="btn" id="nextBtn">Next</button>
+    <button class="btn small" id="nextBtn">Next</button>
   </div>
 </div>
 
 <script>
   // ---- CONFIG ----
-  const API_BASE = 'https://script.google.com/macros/s/AKfycby5tqQAlF7k3jfLs5sKkHjt3Er5qLUOJKrBIpXVHZYG4fjiahRqtKLE10drur2iXlB5Ow/exec'; // https://script.google.com/macros/s/AKfycb.../exec
+  const API_BASE = 'YOUR_GAS_WEB_APP_URL'; // https://script.google.com/macros/s/AKfycb.../exec
   const ROUTE = 'voters';
 
   // Include Remark + an Actions column
@@ -157,10 +166,8 @@
   }
 
   function renderHead(cols) {
-    // add our columns (Remark included) and one extra "Actions" header
-    state.columns = cols;
-    if (!state.columns.includes('Remark')) state.columns.push('Remark');
-
+    // ensure Remark present; then add "Actions" header
+    state.columns = cols.includes('Remark') ? cols : [...cols, 'Remark'];
     theadRow.innerHTML = '';
     sortByEl.innerHTML = '<option value="">(No sort)</option>';
 
@@ -199,15 +206,32 @@
       for (const col of state.columns) {
         const td = document.createElement('td');
         td.dataset.col = col;
-        td.textContent = (row[col] ?? '') + '';
+
+        if (col === 'Voted Earlier') {
+          const sel = document.createElement('select');
+          sel.innerHTML = `<option value="Yes">Yes</option><option value="No">No</option>`;
+          const current = (row[col] ?? '').toString().trim();
+          sel.value = (current === 'No' ? 'No' : 'Yes'); // default to Yes if blank
+          sel.className = 'field-input';
+          sel.addEventListener('change', async () => {
+            sel.disabled = true;
+            const ok = await saveField('Voted Earlier', row['Tower No.'], row['Flat No.'], sel.value);
+            if (!ok) { alert('Failed to update "Voted Earlier"'); sel.value = current || 'Yes'; }
+            sel.disabled = false;
+          });
+          td.appendChild(sel);
+        } else {
+          td.textContent = (row[col] ?? '') + '';
+        }
+
         tr.appendChild(td);
       }
 
-      // Actions cell (edit/save cancel for Remark only)
+      // Actions cell (Edit Remark)
       const act = document.createElement('td');
       act.className = 'actions';
       const btn = document.createElement('button');
-      btn.className = 'btn';
+      btn.className = 'btn small';
       btn.textContent = '✏️ Edit Remark';
       btn.addEventListener('click', () => enterEditRemark(tr, row));
       act.appendChild(btn);
@@ -222,24 +246,24 @@
     if (!remarkTd) return;
 
     const original = remarkTd.textContent || '';
-    remarkTd.innerHTML = `<input class="remark-input" value="${escapeHtmlAttr(original)}" />`;
+    remarkTd.innerHTML = `<input class="field-input" value="${escapeHtmlAttr(original)}" />`;
     const input = remarkTd.querySelector('input');
 
     const actTd = tr.lastElementChild;
     actTd.innerHTML = '';
 
     const saveBtn = document.createElement('button');
-    saveBtn.className = 'btn'; saveBtn.textContent = '💾 Save';
+    saveBtn.className = 'btn small'; saveBtn.textContent = '💾 Save';
     saveBtn.addEventListener('click', async () => {
       saveBtn.disabled = true;
-      const ok = await saveRemark(row['Tower No.'], row['Flat No.'], input.value);
+      const ok = await saveField('Remark', row['Tower No.'], row['Flat No.'], input.value);
       saveBtn.disabled = false;
       if (ok) { remarkTd.textContent = input.value; restoreActions(actTd, tr, row); }
       else { alert('Failed to save Remark'); }
     });
 
     const cancelBtn = document.createElement('button');
-    cancelBtn.className = 'btn'; cancelBtn.style.marginLeft = '6px'; cancelBtn.textContent = '↩︎ Cancel';
+    cancelBtn.className = 'btn small'; cancelBtn.style.marginLeft = '6px'; cancelBtn.textContent = '↩︎ Cancel';
     cancelBtn.addEventListener('click', () => { remarkTd.textContent = original; restoreActions(actTd, tr, row); });
 
     actTd.appendChild(saveBtn);
@@ -250,18 +274,20 @@
   function restoreActions(actTd, tr, row) {
     actTd.innerHTML = '';
     const btn = document.createElement('button');
-    btn.className = 'btn'; btn.textContent = '✏️ Edit Remark';
+    btn.className = 'btn small'; btn.textContent = '✏️ Edit Remark';
     btn.addEventListener('click', () => enterEditRemark(tr, row));
     actTd.appendChild(btn);
   }
 
-  async function saveRemark(tower, flat, remark) {
+  // --- generic update POST helper ---
+  async function saveField(field, tower, flat, value) {
     try {
       const body = new URLSearchParams();
-      body.set('route', 'updateRemark');
+      body.set('route', 'updateField');
+      body.set('field', field);
       body.set('tower', String(tower ?? ''));
-      body.set('flat', String(flat ?? ''));
-      body.set('remark', remark ?? '');
+      body.set('flat',  String(flat  ?? ''));
+      body.set('value', value ?? '');
 
       const res = await fetch(API_BASE, {
         method: 'POST',
@@ -277,15 +303,15 @@
     }
   }
 
-  // util
+  // utils
   function escapeHtmlAttr(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
-
   function renderPager() {
     const pages = Math.max(1, Math.ceil(state.total / state.limit));
     pageInfo.textContent = `Page ${state.page} of ${pages}`;
     prevBtn.disabled = state.page <= 1;
     nextBtn.disabled = state.page >= pages;
   }
+  function debounce(fn, ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; }
 
   // events
   qEl.addEventListener('input', debounce(() => { state.q = qEl.value.trim(); state.page = 1; fetchRows(); }, 250));
@@ -294,8 +320,6 @@
   pageSizeEl.addEventListener('change', () => { state.limit = parseInt(pageSizeEl.value,10); state.page = 1; fetchRows(); });
   prevBtn.addEventListener('click', () => { if (state.page > 1) { state.page--; fetchRows(); } });
   nextBtn.addEventListener('click', () => { state.page++; fetchRows(); });
-
-  function debounce(fn, ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; }
 
   // init
   fetchRows();
