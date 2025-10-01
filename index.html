@@ -1,45 +1,56 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Voters</title>
-  <style>
-    :root { --bg:#0b1020; --card:#121833; --muted:#aab3d0; --txt:#eaf0ff; --accent:#6ea8fe; }
-    * { box-sizing: border-box; }
-    body { margin:0; font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; background: var(--bg); color: var(--txt); }
-    header { padding: 20px clamp(16px, 3vw, 32px); display:flex; gap:16px; align-items:center; justify-content:space-between; position:sticky; top:0; backdrop-filter: blur(6px); background: color-mix(in oklab, var(--bg) 70%, transparent); border-bottom: 1px solid #1f2748; z-index: 10;}
-    .brand { font-weight:700; letter-spacing:.3px; display:flex; gap:10px; align-items:center;}
-    .brand small { color: var(--muted); font-weight:500; }
-    .toolbar { display:flex; gap:10px; flex-wrap:wrap; }
-    input[type="search"], select { background: var(--card); color: var(--txt); border: 1px solid #263057; border-radius: 10px; padding: 10px 12px; outline:none; }
-    input[type="search"]::placeholder { color: #9aa6d1; }
-    .chip { padding:10px 12px; background: var(--card); border:1px solid #263057; border-radius:10px; color: var(--muted); }
-    .container { padding: 18px clamp(12px, 3vw, 32px) 40px; }
-    .tablewrap { overflow:auto; border: 1px solid #263057; border-radius: 14px; background: var(--card); }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 900px; }
-    thead th { position: sticky; top: 0; background: #161e3c; color: #cfd7ff; text-align: left; padding: 12px 10px; border-bottom: 1px solid #263057; }
-    tbody td { padding: 10px; border-bottom: 1px dashed #223058; }
-    tbody tr:hover { background: #10183a; }
-    .sortable { cursor: pointer; user-select: none; }
-    .sort-ind { opacity: .7; font-size: 12px; padding-left: 6px; }
-    .muted { color: var(--muted); }
-    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; }
-    .pager { display:flex; gap:8px; align-items:center; justify-content:flex-end; padding: 10px 2px; }
-    .btn { background:#1b2550; border:1px solid #2a3770; color:var(--txt); padding:8px 12px; border-radius:10px; cursor:pointer; }
-    .btn[disabled] { opacity:.5; cursor:not-allowed; }
-    @media (max-width: 700px) {
-      header { flex-direction: column; align-items: stretch; gap: 12px; }
-      .pager { justify-content: center; }
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Voters</title>
+<style>
+  :root { --bg:#0b1020; --card:#121833; --muted:#aab3d0; --txt:#eaf0ff; --accent:#6ea8fe; }
+  *{ box-sizing:border-box }
+  body{ margin:0; font-family: ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"; background:var(--bg); color:var(--txt) }
+  header{ padding:20px clamp(16px,3vw,32px); display:flex; gap:16px; align-items:center; justify-content:space-between; position:sticky; top:0; backdrop-filter: blur(6px); background: color-mix(in oklab, var(--bg) 70%, transparent); border-bottom: 1px solid #1f2748; z-index:10 }
+  .brand{ font-weight:700; letter-spacing:.3px; display:flex; gap:10px; align-items:center }
+  .brand small{ color:var(--muted); font-weight:500 }
+  .toolbar{ display:flex; gap:10px; flex-wrap:wrap }
+  input[type="search"], select{ background: var(--card); color: var(--txt); border: 1px solid #263057; border-radius: 10px; padding: 10px 12px; outline: none }
+  input[type="search"]::placeholder{ color:#9aa6d1 }
+  .chip{ padding:10px 12px; background: var(--card); border:1px solid #263057; border-radius:10px; color:var(--muted) }
+  .container{ padding: 18px clamp(12px, 3vw, 32px) 40px }
+  .section{ background:#0f1734; border: 1px solid #233160; border-radius:16px; padding:16px; margin-bottom:18px }
+  .section h2{ margin:0 0 12px; font-size:20px; color:#e5ecff; display:flex; gap:8px; align-items:center }
+  .section h2::before{ content:"📊" }
+  /* Summary cards */
+  .cards{ display:grid; grid-template-columns: repeat(6, minmax(140px,1fr)); gap:14px }
+  @media (max-width:1200px){ .cards{ grid-template-columns: repeat(3,1fr) } }
+  @media (max-width:640px){ .cards{ grid-template-columns: repeat(2,1fr) } }
+  .card{
+    border-radius:14px; padding:16px; text-align:center; 
+    background: linear-gradient(135deg, #5b79ff 0%, #7a4de0 100%);
+    color:white; box-shadow: 0 6px 20px rgba(20,30,70,.25);
+  }
+  .card .k{ font-size:15px; font-weight:700; opacity:.95 }
+  .card .v{ font-size:28px; font-weight:800; margin-top:6px }
+  /* Table */
+  .tablewrap{ overflow:auto; border:1px solid #263057; border-radius:14px; background: var(--card) }
+  table{ width:100%; border-collapse:collapse; font-size:14px; min-width:900px }
+  thead th{ position:sticky; top:0; background:#161e3c; color:#cfd7ff; text-align:left; padding:12px 10px; border-bottom:1px solid #263057 }
+  tbody td{ padding:10px; border-bottom:1px dashed #223058 }
+  tbody tr:hover{ background:#10183a }
+  .sortable{ cursor:pointer; user-select:none }
+  .sort-ind{ opacity:.7; font-size:12px; padding-left:6px }
+  .muted{ color:var(--muted) }
+  .pager{ display:flex; gap:8px; align-items:center; justify-content:flex-end; padding: 10px 2px }
+  .btn{ background:#1b2550; border:1px solid #2a3770; color:var(--txt); padding:8px 12px; border-radius:10px; cursor:pointer }
+  .btn[disabled]{ opacity:.5; cursor:not-allowed }
+  @media (max-width:700px){
+    header{ flex-direction:column; align-items:stretch; gap:12px }
+    .pager{ justify-content:center }
+  }
+</style>
 </head>
 <body>
   <header>
-    <div class="brand">
-      <div>🗳️ Voters</div>
-      <small id="meta" class="muted"></small>
-    </div>
+    <div class="brand">🗳️ Voters <small id="meta" class="muted"></small></div>
     <div class="toolbar">
       <input id="q" type="search" placeholder="Quick search..." />
       <select id="sortBy"></select>
@@ -54,12 +65,17 @@
     </div>
   </header>
 
+  <!-- Summary -->
   <div class="container">
+    <div class="section">
+      <h2>Summary Statistics</h2>
+      <div class="cards" id="cards"></div>
+    </div>
+
+    <!-- Table -->
     <div class="tablewrap">
       <table id="tbl">
-        <thead>
-          <tr id="theadRow"></tr>
-        </thead>
+        <thead><tr id="theadRow"></tr></thead>
         <tbody id="tbody"></tbody>
       </table>
     </div>
@@ -72,23 +88,18 @@
 
 <script>
   // ---- CONFIG ----
-  const API_BASE = 'https://script.google.com/macros/s/AKfycby5tqQAlF7k3jfLs5sKkHjt3Er5qLUOJKrBIpXVHZYG4fjiahRqtKLE10drur2iXlB5Ow/exec'; // e.g., https://script.google.com/macros/s/AKfycb.../exec
+  const API_BASE = 'https://script.google.com/macros/s/AKfycby5tqQAlF7k3jfLs5sKkHjt3Er5qLUOJKrBIpXVHZYG4fjiahRqtKLE10drur2iXlB5Ow/exec'; // e.g. https://script.google.com/macros/s/AKfycb.../exec
   const ROUTE = 'voters';
   const DEFAULT_COLUMNS = [
-    'Tower No.', 'Flat No.', 'First Owner Name', 'Second Owner Name',
-    'Membership Card & Share Certificate No', 'Eligible Voter', 'Discrepency', 'Voted Earlier'
+    'Tower No.','Flat No.','First Owner Name','Second Owner Name',
+    'Membership Card & Share Certificate No','Eligible Voter','Discrepency','Voted Earlier'
   ];
 
   // ---- STATE ----
   let state = {
-    q: '',
-    sort: '',
-    dir: 'asc',
-    page: 1,
-    limit: 100,
-    total: 0,
-    columns: [...DEFAULT_COLUMNS],
-    rows: []
+    q: '', sort: '', dir: 'asc', page: 1, limit: 100,
+    total: 0, columns: [...DEFAULT_COLUMNS], rows: [],
+    summary: { T1:0, T2:0, T3:0, T4:0, T5:0, total:0 }
   };
 
   // ---- DOM ----
@@ -103,13 +114,14 @@
   const pageInfo = document.getElementById('pageInfo');
   const totalChip = document.getElementById('totalChip');
   const meta = document.getElementById('meta');
+  const cards = document.getElementById('cards');
 
-  function qs(params) {
+  function urlWithParams() {
     const u = new URL(API_BASE);
     u.searchParams.set('route', ROUTE);
     u.searchParams.set('v', '1');
-    if (state.q) u.searchParams.set('q', state.q);
-    if (state.sort) u.searchParams.set('sort', state.sort);
+    if (state.q)   u.searchParams.set('q', state.q);
+    if (state.sort)u.searchParams.set('sort', state.sort);
     if (state.dir) u.searchParams.set('dir', state.dir);
     u.searchParams.set('page', state.page);
     u.searchParams.set('limit', state.limit);
@@ -119,15 +131,16 @@
   async function fetchRows() {
     tbody.innerHTML = `<tr><td class="muted" colspan="${state.columns.length}">Loading…</td></tr>`;
     try {
-      const res = await fetch(qs(), { method: 'GET', mode: 'cors' });
+      const res = await fetch(urlWithParams(), { method: 'GET', mode: 'cors' });
       const data = await res.json();
-
       if (!data.ok) throw new Error(data.error || 'API error');
 
       state.total = data.total;
-      state.rows = data.rows;
+      state.rows = data.rows || [];
+      state.summary = data.summary || state.summary;
 
-      renderHead(data.rows[0] ? Object.keys(data.rows[0]) : state.columns);
+      renderSummary();
+      renderHead(state.rows[0] ? Object.keys(state.rows[0]) : state.columns);
       renderBody();
       renderPager();
       totalChip.textContent = `${state.total} rows`;
@@ -137,12 +150,29 @@
     }
   }
 
+  function renderSummary() {
+    const s = state.summary || {};
+    const items = [
+      ['Tower T1', s.T1 || 0],
+      ['Tower T2', s.T2 || 0],
+      ['Tower T3', s.T3 || 0],
+      ['Tower T4', s.T4 || 0],
+      ['Tower T5', s.T5 || 0],
+      ['Total Flats', s.total || 0],
+    ];
+    cards.innerHTML = items.map(([k,v]) => `
+      <div class="card">
+        <div class="k">${k}</div>
+        <div class="v">${v}</div>
+      </div>
+    `).join('');
+  }
+
   function renderHead(cols) {
     state.columns = cols;
     theadRow.innerHTML = '';
     sortByEl.innerHTML = '<option value="">(No sort)</option>';
     cols.forEach(col => {
-      // header cells (clickable sort)
       const th = document.createElement('th');
       th.className = 'sortable';
       th.textContent = col;
@@ -156,18 +186,14 @@
         if (state.sort === col) {
           state.dir = state.dir === 'asc' ? 'desc' : 'asc';
         } else {
-          state.sort = col;
-          state.dir = 'asc';
+          state.sort = col; state.dir = 'asc';
         }
-        state.page = 1;
-        fetchRows();
+        state.page = 1; fetchRows();
       });
       theadRow.appendChild(th);
 
-      // sort dropdown
       const opt = document.createElement('option');
-      opt.value = col;
-      opt.textContent = col;
+      opt.value = col; opt.textContent = col;
       if (state.sort === col) opt.selected = true;
       sortByEl.appendChild(opt);
     });
@@ -183,15 +209,8 @@
       const tr = document.createElement('tr');
       state.columns.forEach(col => {
         const td = document.createElement('td');
-        let v = row[col];
-        // Pretty booleans like "Yes"
-        if (String(v).toLowerCase() === 'yes') {
-          td.textContent = 'Yes';
-        } else if (String(v).toLowerCase() === 'no') {
-          td.textContent = 'No';
-        } else {
-          td.textContent = v === undefined || v === null ? '' : v;
-        }
+        const v = row[col];
+        td.textContent = (v === undefined || v === null) ? '' : String(v);
         tr.appendChild(td);
       });
       tbody.appendChild(tr);
@@ -205,19 +224,17 @@
     nextBtn.disabled = state.page >= pages;
   }
 
-  // ---- Events ----
+  // ---- UI events ----
   qEl.addEventListener('input', debounce(() => { state.q = qEl.value.trim(); state.page = 1; fetchRows(); }, 250));
   sortByEl.addEventListener('change', () => { state.sort = sortByEl.value; state.page = 1; fetchRows(); });
   sortDirEl.addEventListener('change', () => { state.dir = sortDirEl.value; state.page = 1; fetchRows(); });
-  pageSizeEl.addEventListener('change', () => { state.limit = parseInt(pageSizeEl.value, 10); state.page = 1; fetchRows(); });
+  pageSizeEl.addEventListener('change', () => { state.limit = parseInt(pageSizeEl.value,10); state.page = 1; fetchRows(); });
   prevBtn.addEventListener('click', () => { if (state.page > 1) { state.page--; fetchRows(); } });
   nextBtn.addEventListener('click', () => { state.page++; fetchRows(); });
 
-  function debounce(fn, ms) {
-    let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn.apply(null, args), ms); };
-  }
+  function debounce(fn, ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; }
 
-  // ---- init ----
+  // init
   fetchRows();
 </script>
 </body>
