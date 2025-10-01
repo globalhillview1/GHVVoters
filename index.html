@@ -18,7 +18,6 @@
   .container{ padding:18px clamp(12px,3vw,32px) 40px }
   .section{ background:#0f1734; border:1px solid #233160; border-radius:16px; padding:16px; margin-bottom:18px }
   .section h2{ margin:0 0 12px; font-size:20px; color:#e5ecff; display:flex; gap:8px; align-items:center }
-  .section h2::before{ content:"" }
   .cards{ display:grid; grid-template-columns:repeat(6,minmax(140px,1fr)); gap:14px }
   @media (max-width:1200px){ .cards{ grid-template-columns:repeat(3,1fr) } }
   @media (max-width:640px){ .cards{ grid-template-columns:repeat(2,1fr) } }
@@ -56,12 +55,12 @@
 </header>
 
 <div class="section">
-  <h2 style="display:flex; align-items:center; gap:10px;">
+  <h2 style="display:flex; align-items:center; justify-content:center; gap:12px; text-align:center;">
     <img src="favicon-32x32.png" alt="Logo" style="height:28px; width:28px;" />
-    Global Hillview, Shareholder (Voter) List for RWA Election 2025
+    Global Hillview, Shareholders/Voters List for RWA Election 2025
   </h2>
   <h3 style="margin-top:12px; margin-bottom:12px; font-size:18px; color:#e5ecff;">
-    📊 Summary Statistics
+    📊 Voters Statistics
   </h3>
   <div class="cards" id="cards"></div>
 </div>
