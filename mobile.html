@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Voters · Mobile</title>
+<style>
+  :root { --bg:#0b1020; --card:#121833; --muted:#aab3d0; --txt:#eaf0ff; --border:#233160; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html,body { margin:0; height:100%; }
+  body { font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Arial; background:var(--bg); color:var(--txt); }
+
+  /* Top bar */
+  .top {
+    position: sticky; top: 0; z-index: 20;
+    display: grid; grid-template-columns: 1fr auto; gap:10px; align-items:center;
+    padding: 12px 12px env(safe-area-inset-right) 12px;
+    background: #0b1020ee; backdrop-filter: blur(12px); border-bottom: 1px solid #1f2748;
+  }
+  .brand { display:flex; align-items:center; gap:8px; }
+  .brand img { width:28px; height:28px; border-radius:6px }
+  .brand b { font-size: 14px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .top-actions { display:flex; gap:8px; }
+  .btn, .input, select {
+    background: var(--card); color: var(--txt); border:1px solid var(--border);
+    border-radius: 10px; padding: 10px 12px; font-size: 14px;
+  }
+  .btn { text-decoration:none; display:inline-flex; align-items:center; gap:6px }
+  .input { width:100% }
+  .toolbar { padding:10px 12px; display:grid; grid-template-columns: 1fr 110px; gap:8px; }
+
+  /* Section shells */
+  .wrap { padding: 0 12px 100px; }
+  .section { background:#0f1734; border:1px solid var(--border); border-radius:14px; padding:12px; margin:12px 0; }
+
+  /* Summary cards — two columns on phones */
+  .cards { display:grid; grid-template-columns: repeat(2,1fr); gap:10px }
+  .card {
+    border-radius:14px; padding:12px; text-align:center;
+    background:linear-gradient(135deg,#5b79ff 0%, #7a4de0 100%); color:white;
+  }
+  .card .k{ font-size:12px; font-weight:700; opacity:.95 }
+  .card .v{ font-size:22px; font-weight:800; margin-top:4px }
+
+  /* List items (rows) */
+  .row {
+    background: var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px;
+  }
+  .row .a { display:flex; justify-content:space-between; gap:10px; margin-bottom:6px; }
+  .tower { font-weight:800; letter-spacing:.2px }
+  .flat { color:#d7e0ff; font-weight:700 }
+  .kv { display:grid; grid-template-columns: 1fr; gap:6px; font-size:13px; color:var(--muted) }
+  .kv b { color:#eaf0ff; font-weight:700 }
+  .editline { margin-top:10px; display:grid; grid-template-columns: 1fr; gap:8px; }
+  .field-input { width:100%; background:#0f1530; color:#fff; border:1px solid #2a3770; border-radius:8px; padding:8px }
+  .row-actions { display:flex; gap:8px; justify-content:flex-end }
+  .btn.small { padding:8px 10px; font-size:12px; border-radius:8px }
+  .muted { color: var(--muted) }
+
+  /* Pager */
+  .pager {
+    position: fixed; left:0; right:0; bottom:0;
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    background:#0b1020f2; border-top:1px solid #1f2748;
+  }
+  .pager .info { color: var(--muted); font-size: 13px }
+  .grow { flex:1 }
+
+  /* Larger phones & tablets tweak */
+  @media (min-width: 480px) {
+    .cards { grid-template-columns: repeat(3,1fr); }
+  }
+  @media (min-width: 640px) {
+    .cards { grid-template-columns: repeat(6,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="top">
+  <div class="brand">
+    <img src="favicon-32x32.png" alt="Logo" style="height:28px; width:28px;" />
+    <b>Voters · Mobile</b>
+  </div>
+  <div class="top-actions">
+    <a href="index.html" class="btn" title="Desktop view">🖥️ Desktop</a>
+    <a href="schedule.html" class="btn" title="Election Schedule">📅 Schedule</a>
+  </div>
+</div>
+
+<!-- Search / Sort -->
+<div class="toolbar">
+  <input id="q" class="input" type="search" placeholder="Search by flat, name, tower…" />
+  <select id="sortBy">
+    <option value="">(No sort)</option>
+    <option value="Tower No.">Tower</option>
+    <option value="Flat No.">Flat</option>
+    <option value="First Owner Name">Owner</option>
+  </select>
+</div>
+
+<div class="wrap">
+  <!-- Title -->
+  <div class="section" style="text-align:center">
+    <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
+      <img src="your-logo.png" alt="Logo" style="width:40px;height:40px;border-radius:10px">
+      <h1 style="margin:0; font-size:18px; font-weight:800;">
+        Global Hillview, Shareholder (Voter) List for RWA Election 2025
+      </h1>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="section">
+    <h2 style="margin:0 0 8px; font-size:16px; font-weight:800;">Summary Statistics</h2>
+    <div class="cards" id="cards"></div>
+  </div>
+
+  <!-- Rows -->
+  <div id="list"></div>
+</div>
+
+<!-- Pager -->
+<div class="pager">
+  <button id="prevBtn" class="btn small">Prev</button>
+  <div class="grow"></div>
+  <div class="info" id="pageInfo">Page 1</div>
+  <div class="grow"></div>
+  <button id="nextBtn" class="btn small">Next</button>
+</div>
+
+<script>
+  // ---- CONFIG ----
+  const API_BASE = 'https://script.google.com/macros/s/AKfycby5tqQAlF7k3jfLs5sKkHjt3Er5qLUOJKrBIpXVHZYG4fjiahRqtKLE10drur2iXlB5Ow/exec'; // https://script.google.com/macros/s/AKfycb.../exec
+  const ROUTE = 'voters';
+
+  // ---- STATE ----
+  let state = { q:'', sort:'', dir:'asc', page:1, limit:25, total:0, rows:[], summary:{} };
+
+  // ---- DOM ----
+  const qEl = document.getElementById('q');
+  const sortByEl = document.getElementById('sortBy');
+  const list = document.getElementById('list');
+  const pageInfo = document.getElementById('pageInfo');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const cards = document.getElementById('cards');
+
+  function urlWithParams() {
+    const u = new URL(API_BASE);
+    u.searchParams.set('route', ROUTE);
+    if (state.q)   u.searchParams.set('q', state.q);
+    if (state.sort)u.searchParams.set('sort', state.sort);
+    u.searchParams.set('dir', state.dir);
+    u.searchParams.set('page', state.page);
+    u.searchParams.set('limit', state.limit);
+    return u.toString();
+  }
+
+  async function fetchRows() {
+    list.innerHTML = '<div class="muted" style="padding:12px">Loading…</div>';
+    try {
+      const res = await fetch(urlWithParams(), { method:'GET', mode:'cors' });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'API error');
+      state.total = data.total;
+      state.rows = data.rows || [];
+      state.summary = data.summary || {};
+      renderSummary();
+      renderList();
+      renderPager();
+    } catch (e) {
+      list.innerHTML = `<div style="color:#ff9a9a; padding:12px">Failed: ${e.message}</div>`;
+    }
+  }
+
+  function renderSummary() {
+    const s = state.summary || {};
+    const items = [
+      ['Tower T1', s.T1||0], ['Tower T2', s.T2||0], ['Tower T3', s.T3||0],
+      ['Tower T4', s.T4||0], ['Tower T5', s.T5||0], ['Total Flats', s.total||0]
+    ];
+    cards.innerHTML = items.map(([k,v]) => `
+      <div class="card"><div class="k">${k}</div><div class="v">${v}</div></div>
+    `).join('');
+  }
+
+  function renderList() {
+    if (!state.rows.length) {
+      list.innerHTML = '<div class="muted" style="padding:12px">No results</div>';
+      return;
+    }
+    list.innerHTML = state.rows.map(r => rowCard(r)).join('');
+    // hook up events for each dynamic element
+    list.querySelectorAll('select[data-col="Voted Earlier"]').forEach(sel => {
+      sel.addEventListener('change', async (e) => {
+        const { tower, flat } = e.target.dataset;
+        sel.disabled = true;
+        const ok = await saveField('Voted Earlier', tower, flat, sel.value);
+        if (!ok) { alert('Failed to update'); }
+        sel.disabled = false;
+      });
+    });
+    list.querySelectorAll('button[data-action="edit-remark"]').forEach(btn => {
+      btn.addEventListener('click', () => enterEditRemark(btn));
+    });
+  }
+
+  function rowCard(r) {
+    const voted = (r['Voted Earlier'] || '').toString().trim();
+    const selectHTML = `
+      <select class="field-input" data-col="Voted Earlier" data-tower="${escapeAttr(r['Tower No.'])}" data-flat="${escapeAttr(r['Flat No.'])}">
+        <option value="Yes"${voted!=='No'?' selected':''}>Yes</option>
+        <option value="No"${voted==='No'?' selected':''}>No</option>
+      </select>
+    `;
+    const remark = r['Remark'] ?? '';
+    return `
+      <div class="row" data-tower="${escapeAttr(r['Tower No.'])}" data-flat="${escapeAttr(r['Flat No.'])}">
+        <div class="a">
+          <div><span class="tower">Tower ${r['Tower No.']}</span> · Flat <span class="flat">${r['Flat No.']}</span></div>
+          <div class="muted">Card # ${r['Membership Card & Share Certificate No'] ?? ''}</div>
+        </div>
+        <div class="kv">
+          <div><b>First Owner:</b> ${esc(r['First Owner Name'] ?? '')}</div>
+          <div><b>Second Owner:</b> ${esc(r['Second Owner Name'] ?? '')}</div>
+          <div><b>Eligible:</b> ${esc(r['Eligible Voter'] ?? '')} · <b>Discrepency:</b> ${esc(r['Discrepency'] ?? '')}</div>
+          <div><b>Voted Earlier:</b> ${selectHTML}</div>
+        </div>
+        <div class="editline">
+          <label class="muted" for="rk-${escId(r)}">Remark</label>
+          <input id="rk-${escId(r)}" class="field-input" value="${escapeAttr(remark)}" />
+          <div class="row-actions">
+            <button class="btn small" data-action="edit-remark" data-tower="${escapeAttr(r['Tower No.'])}" data-flat="${escapeAttr(r['Flat No.'])}">💾 Save Remark</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async function enterEditRemark(btn) {
+    const card = btn.closest('.row');
+    const tower = card.dataset.tower;
+    const flat  = card.dataset.flat;
+    const input = card.querySelector('input.field-input');
+    btn.disabled = true;
+    const ok = await saveField('Remark', tower, flat, input.value);
+    if (!ok) alert('Failed to save Remark');
+    btn.disabled = false;
+  }
+
+  function renderPager() {
+    const pages = Math.max(1, Math.ceil(state.total / state.limit));
+    pageInfo.textContent = `Page ${state.page} of ${pages}`;
+    prevBtn.disabled = state.page <= 1;
+    nextBtn.disabled = state.page >= pages;
+  }
+
+  // --- POST helper (same API as desktop) ---
+  async function saveField(field, tower, flat, value) {
+    try {
+      const body = new URLSearchParams();
+      body.set('route', 'updateField');
+      body.set('field', field);
+      body.set('tower', String(tower ?? ''));
+      body.set('flat',  String(flat  ?? ''));
+      body.set('value', value ?? '');
+      const res = await fetch(API_BASE, {
+        method:'POST', mode:'cors',
+        headers:{ 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8' },
+        body
+      });
+      const data = await res.json();
+      return !!data.ok;
+    } catch (e) { console.error(e); return false; }
+  }
+
+  // utils
+  const debounce = (fn,ms)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
+  const esc = s => String(s).replace(/[<>&]/g, m => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));
+  const escapeAttr = s => String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const escId = r => `${r['Tower No.']}-${r['Flat No.']}`.replace(/[^a-zA-Z0-9_-]/g,'_');
+
+  // events
+  qEl.addEventListener('input', debounce(() => { state.q = qEl.value.trim(); state.page = 1; fetchRows(); }, 250));
+  sortByEl.addEventListener('change', () => { state.sort = sortByEl.value; state.page = 1; fetchRows(); });
+  prevBtn.addEventListener('click', ()=>{ if (state.page>1){ state.page--; fetchRows(); } });
+  nextBtn.addEventListener('click', ()=>{ state.page++; fetchRows(); });
+
+  // init
+  fetchRows();
+</script>
+</body>
+</html>
